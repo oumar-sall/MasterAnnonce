@@ -23,9 +23,9 @@
 
         <hr>
 
-        <a href="AnnonceList" class="btn btn-list">Consulter les annonces</a>
+        <a href="annonces" class="btn btn-list">Consulter les annonces</a>
 
-        <a href="AnnonceAdd" class="btn btn-add">Déposer une annonce</a>
+        <a href="login" class="btn btn-add">Se connecter</a>
     </div>
 
 </body>
