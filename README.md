@@ -1,64 +1,75 @@
-Ce projet est une application web de gestion d'annonces développée dans le cadre du module de développement Java EE. Elle permet de lister, créer, modifier et filtrer des annonces par catégorie et statut.
+# 📑 API de Petites Annonces - Projet Industrialisé
 
-🚀 Fonctionnalités
-Gestion des Annonces : Création (statut DRAFT par défaut), Edition et Affichage.
+Ce projet est une application de gestion de petites annonces développée en **Jakarta EE**. Il a été conçu pour répondre aux exigences d'industrialisation (Exercice 10), incluant la traçabilité, la performance et la documentation.
 
-Authentification : Système de session pour identifier l'auteur de chaque annonce.
+---
 
-Persistance JPA/Hibernate : Stockage des données dans une base PostgreSQL.
+## 🛠️ Stack Technique
+* **Backend** : Jakarta EE 10 (JAX-RS, JPA, Bean Validation)
+* **Serveur d'application** : Apache Tomcat 10+
+* **Base de données** : PostgreSQL
+* **Logging** : SLF4J + Logback
+* **Tests** : JUnit 5, RestAssured
 
-Filtrage & Pagination : Navigation fluide dans la liste des annonces.
+---
 
-Catégories : Gestion des catégories via une relation @ManyToOne.
+## 🚀 Installation et Lancement
 
-🛠️ Technologies utilisées
-Java 21
+### 1. Prérequis
+* Java 17 ou supérieur
+* Maven 3.8+
+* Une base de données PostgreSQL active
 
-Jakarta EE 11 (Servlets, JSP, JSTL)
+### 2. Configuration Database
+Modifiez le fichier `src/main/resources/META-INF/persistence.xml` avec vos accès :
+```xml
+<property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/votre_db"/>
+<property name="jakarta.persistence.jdbc.user" value="votre_utilisateur"/>
+<property name="jakarta.persistence.jdbc.password" value="votre_mot_de_passe"/>
 
-Hibernate 6 (JPA)
+# Compiler et packager l'application (génère le .war)
+mvn clean package
 
-PostgreSQL
+Déployez le fichier .war généré dans le dossier webapps de votre serveur Tomcat.
 
-Tomcat 11
+🧪 Stratégie de Tests
+L'exécution des tests est séparée via les plugins Maven Surefire et Failsafe :
 
-⚙️ Configuration du projet
-1. Base de données
-Assurez-vous d'avoir une instance PostgreSQL active.
+Tests Unitaires (mvn test) : Vérifient la logique des Mappers et des Services avec Mockito. Ils excluent les classes finissant par *IntegrationTest.
 
-Créez une base de données nommée tp01dev.
+Tests d'Intégration (mvn verify) : Lancent les tests de bout en bout (RestAssured) nécessitant un serveur et une base de données.
 
-Modifiez le fichier src/main/resources/META-INF/persistence.xml avec vos identifiants :
+Pourquoi cette séparation ? Cela permet un cycle de feedback rapide : les tests unitaires s'exécutent en quelques secondes à chaque modification, tandis que les tests d'intégration, plus lourds, sont réservés aux phases de validation finale.
 
-XML
-<property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/tp01dev"/>
-<property name="jakarta.persistence.jdbc.user" value="VOTRE_LOGIN"/>
-<property name="jakarta.persistence.jdbc.password" value="VOTRE_MDP"/>
-2. Données initiales (SQL)
-Pour tester l'application, exécutez ces scripts d'initialisation dans votre outil SQL (pgAdmin) :
+J'avais eu un problème pour les tests d'endpoints. C'est pour ça que j'ai créer un fichier pour les plugins de mockito.
 
-SQL
--- Création d'un utilisateur de test
-INSERT INTO users (username, password, email) VALUES ('admin', 'admin123', 'admin@example.com');
+📊 Industrialisation
+1. Logging Structuré (SLF4J)
+L'application utilise SLF4J pour une gestion professionnelle des journaux :
 
--- Création des catégories
-INSERT INTO category (label) VALUES ('Immobilier'), ('Véhicules'), ('Emploi');
-🏃 Lancement
-Importez le projet sous IntelliJ IDEA (Maven project).
+INFO : Traces métier (ex: "Annonce ID 12 créée par l'utilisateur X").
 
-Configurez un serveur Tomcat 11.
+WARN : Alertes de sécurité (ex: "Tentative de modification sans token valide").
 
-Déployez l'artefact tp01Dev:war exploded.
+ERROR : Capture des exceptions avec stacktrace complète pour le débuggage.
 
-Accédez à l'application via : http://localhost:8080/tp01Dev/login
+DEBUG : Détails techniques (requêtes JPQL générées, nombre de résultats).
 
-📂 Structure du code
-com.example.tp01dev.model : Entités JPA (Annonce, User, Category).
+2. Tests de Charge Simples
+Inclus dans src/test/java/.../LoadTest.java. Ce test utilise un ExecutorService pour simuler des requêtes concurrentes massives. Il permet de valider la stabilité du pool de connexions JPA et la gestion des accès multi-threads.
 
-com.example.tp01dev.repository : Couche d'accès aux données (DAO).
+3. Documentation API (OpenAPI)
+L'API suit les standards OpenAPI. La documentation (Swagger) est accessible via l'endpoint :
+GET /api/openapi.json (ou .yaml).
+Elle détaille chaque ressource (/annonces, /categories, /login), les codes de retour HTTP (200, 201, 401, 404) et les schémas de données attendus.
 
-com.example.tp01dev.service : Logique métier et gestion des transactions.
+🔐 Sécurité & Règles Métier
+Authentification Stateless : Utilisation d'un SecurityFilter interceptant les headers Authorization: Bearer <token>.
 
-com.example.tp01dev.servlet : Contrôleurs gérant les requêtes HTTP.
+Isolation des données : Un utilisateur ne peut modifier ou supprimer que ses propres annonces.
 
-com.example.tp01dev.util : Utilitaires (JPAUtil).
+Cycle de vie :
+
+Modification interdite si l'annonce est au statut PUBLISHED.
+
+Suppression autorisée uniquement si l'annonce est préalablement ARCHIVED.

@@ -22,7 +22,7 @@ public class Annonce {
     private String description;
 
     @Column(length = 64)
-    private String adress;
+    private String address;
 
     @Column(length = 64)
     @Email
@@ -40,6 +40,9 @@ public class Annonce {
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
+
+    @Version
+    private Long version; // Indispensable pour le point 4 de l'exo
 
     public Annonce() {}
 
@@ -68,11 +71,11 @@ public class Annonce {
     }
 
     public String getAdress() {
-        return adress;
+        return address;
     }
 
     public void setAdress(String adress) {
-        this.adress = adress;
+        this.address = adress;
     }
 
     public String getMail() {
