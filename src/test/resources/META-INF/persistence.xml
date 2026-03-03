@@ -2,9 +2,9 @@
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
     <persistence-unit name="TestAnnoncePU">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>com.example.tp01dev.model.User</class>
-        <class>com.example.tp01dev.model.Category</class>
-        <class>com.example.tp01dev.model.Annonce</class>
+        <class>com.example.tp04dev.model.User</class>
+        <class>com.example.tp04dev.model.Category</class>
+        <class>com.example.tp04dev.model.Annonce</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
